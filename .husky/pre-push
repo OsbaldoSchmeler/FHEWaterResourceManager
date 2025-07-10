@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🧪 Running pre-push checks..."
+
+# Run tests
+echo "Running tests..."
+npm test
+
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Push aborted."
+  exit 1
+fi
+
+# Run security audit
+echo "Running security audit..."
+npm run security
+
+echo "✅ Pre-push checks passed!"
