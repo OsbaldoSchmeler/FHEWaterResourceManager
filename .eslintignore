@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+artifacts/
+cache/
+typechain-types/
+coverage/
+dist/
+build/
+
+# Configuration
+hardhat.config.js
+.prettierrc.json
+
+# Deployment
+deployments/
+
+# Test artifacts
+gas-report.txt
+coverage.json
+
+# IDE
+.vscode/
+.idea/
