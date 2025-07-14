@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+artifacts/
+cache/
+typechain-types/
+coverage/
+dist/
+
+# Deployment files
+deployments/
+
+# Documentation
+*.md
+
+# Configuration
+.env
+.env.*
+
+# Test artifacts
+gas-report.txt
+coverage.json
+
+# IDE
+.vscode/
+.idea/
