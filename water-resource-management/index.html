@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Resource Management System</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            background: rgba(20, 25, 40, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            margin-top: 50px;
+        }
+        .card {
+            background: rgba(30, 35, 50, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25px;
+            color: #e0e0e0;
+        }
+        .card-title {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 30px;
+            padding: 12px 35px;
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #0099cc, #007399);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            border: none;
+            border-radius: 30px;
+            padding: 12px 35px;
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            background: linear-gradient(45deg, #00cc6a, #00994d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 255, 136, 0.3);
+        }
+        .btn-warning {
+            background: linear-gradient(45deg, #ff6b6b, #ff5252);
+            border: none;
+            border-radius: 30px;
+            padding: 12px 35px;
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #ff5252, #ff1744);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+        .btn-info {
+            background: linear-gradient(45deg, #7c4dff, #651fff);
+            border: none;
+            border-radius: 30px;
+            padding: 12px 35px;
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-info:hover {
+            background: linear-gradient(45deg, #651fff, #3d5afe);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 77, 255, 0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4757, #ff3742);
+            border: none;
+            border-radius: 30px;
+            padding: 12px 35px;
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #ff3742, #ff1e30);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.3);
+        }
+        .water-icon {
+            color: #00d4ff;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        .status-badge {
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+        .form-control, .form-select {
+            background: rgba(20, 25, 40, 0.8);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(30, 35, 50, 0.9);
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.25);
+            color: #ffffff;
+        }
+        .form-control::placeholder {
+            color: #888;
+        }
+        .network-info {
+            font-size: 0.9em;
+            margin-top: 15px;
+            color: #b0b0b0;
+        }
+        .contract-address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+            background: rgba(0, 212, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        .display-4 {
+            color: #00d4ff;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        .lead {
+            color: #b0b0b0;
+        }
+        .alert-success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+        }
+        .alert-danger {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: #ff4757;
+        }
+        .alert-warning {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+        .alert-info {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="water-icon">💧</div>
+            <h1 class="display-4 fw-bold text-primary mb-3">Water Resource Management System</h1>
+            <p class="lead text-muted">FHE-based Privacy-Preserving Water Resource Allocation Platform</p>
+        </div>
+
+        <!-- Workflow Guide -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">📋 System Workflow Guide</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div style="font-size: 2em; color: #00d4ff;">1️⃣</div>
+                                    <h6>Connect Wallet</h6>
+                                    <p class="small">Connect your MetaMask wallet to interact with the system</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div style="font-size: 2em; color: #00ff88;">2️⃣</div>
+                                    <h6>Admin: Register Regions</h6>
+                                    <p class="small">Authority registers regions and their managers</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div style="font-size: 2em; color: #ff6b6b;">3️⃣</div>
+                                    <h6>Admin: Start Period</h6>
+                                    <p class="small">Authority starts allocation period with total water amount</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div style="font-size: 2em; color: #7c4dff;">4️⃣</div>
+                                    <h6>Managers: Submit Requests</h6>
+                                    <p class="small">Region managers submit water requests during active period</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <strong>📢 Current Status:</strong> <span id="workflowStatus">Please connect your wallet first</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network & Contract Info -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">🌐 Network & Contract Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Network:</strong> <span id="networkName">Not Connected</span></p>
+                                <p><strong>Chain ID:</strong> <span id="chainId">-</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Contract Address:</strong></p>
+                                <p class="contract-address" id="contractAddress">Not Set</p>
+                                <input type="text" id="contractAddressInput" class="form-control form-control-sm" placeholder="Enter contract address">
+                                <button id="setContractBtn" class="btn btn-sm btn-outline-primary mt-2">Set Contract</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Connection Status</h5>
+                        <p id="connectionStatus" class="mb-3">
+                            <span class="badge bg-warning status-badge">Not Connected</span>
+                        </p>
+                        <button id="connectBtn" class="btn btn-primary">Connect Wallet</button>
+                        <div class="network-info" id="networkInfo"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Functions -->
+        <div class="row mb-4" id="adminSection" style="display: none;">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">🏛️ Register New Region</h5>
+                        <div class="mb-3">
+                            <input type="text" id="regionName" class="form-control" placeholder="Region Name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" id="priorityLevel" class="form-control" placeholder="Priority Level (1-10)" min="1" max="10">
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" id="managerAddress" class="form-control" placeholder="Manager Address">
+                        </div>
+                        <button id="registerRegionBtn" class="btn btn-success">Register Region</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">🌊 Start Allocation Period</h5>
+                        <div class="mb-3">
+                            <input type="number" id="totalWaterAmount" class="form-control" placeholder="Total Water Amount">
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" id="durationHours" class="form-control" placeholder="Duration (Hours)" min="1" max="168">
+                        </div>
+                        <button id="startAllocationBtn" class="btn btn-primary">Start Allocation</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">⚡ Emergency Allocation</h5>
+                        <div class="mb-3">
+                            <input type="number" id="emergencyRegionId" class="form-control" placeholder="Region ID">
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" id="emergencyAmount" class="form-control" placeholder="Emergency Amount">
+                        </div>
+                        <button id="emergencyAllocationBtn" class="btn btn-warning">Emergency Allocation</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">⚙️ Region Management</h5>
+                        <div class="mb-3">
+                            <input type="number" id="deactivateRegionId" class="form-control" placeholder="Region ID to Deactivate">
+                        </div>
+                        <button id="deactivateRegionBtn" class="btn btn-danger">Deactivate Region</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Region Manager Functions -->
+        <div class="row mb-4" id="managerSection" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">💧 Submit Water Request</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <input type="number" id="requestAmount" class="form-control" placeholder="Requested Amount">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <input type="number" id="justificationScore" class="form-control" placeholder="Urgency Score (1-100)" min="1" max="100">
+                                </div>
+                            </div>
+                        </div>
+                        <button id="submitRequestBtn" class="btn btn-success">Submit Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Functions -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">🔍 Region Information</h5>
+                        <div class="mb-3">
+                            <input type="number" id="viewRegionId" class="form-control" placeholder="Region ID">
+                        </div>
+                        <button id="viewRegionBtn" class="btn btn-info">View Region</button>
+                        <div id="regionInfo" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">📋 Request Status</h5>
+                        <div class="mb-3">
+                            <input type="number" id="statusRegionId" class="form-control" placeholder="Region ID">
+                        </div>
+                        <button id="viewStatusBtn" class="btn btn-info">View Status</button>
+                        <div id="requestStatus" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Allocation Period Info -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Current Allocation Period Status</h5>
+                        <div id="periodInfo">
+                            <p class="text-muted">Loading...</p>
+                        </div>
+                        <button id="refreshBtn" class="btn btn-warning">Refresh Status</button>
+                        <button id="processAllocationBtn" class="btn btn-primary" style="display: none;">Process Allocation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operation History -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">📜 Operation History</h5>
+                        <div id="logContainer">
+                            <p class="text-muted">No operations recorded</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Contract ABI for WaterResourceManager
+        const contractABI = [
+            "function authority() view returns (address)",
+            "function currentAllocationPeriod() view returns (uint32)",
+            "function totalRegions() view returns (uint32)",
+            "function nextRegionId() view returns (uint32)",
+
+            "function registerRegion(string calldata name, uint32 _priorityLevel, address _manager) external returns (uint32)",
+            "function startAllocationPeriod(uint32 _totalAvailableWater, uint256 _durationHours) external",
+            "function submitWaterRequest(uint32 _requestedAmount, uint32 _justificationScore) external",
+            "function processAllocation() external",
+            "function emergencyWaterAllocation(uint32 regionId, uint32 emergencyAmount) external",
+            "function deactivateRegion(uint32 regionId) external",
+            "function updateRegionManager(uint32 regionId, address newManager) external",
+
+            "function getRegionInfo(uint32 regionId) view returns (string memory name, bool isActive, uint256 lastUpdateTime, address manager)",
+            "function getCurrentPeriodInfo() view returns (uint32 periodId, uint256 startTime, uint256 endTime, bool distributionCompleted, uint32 participatingRegions, bool isActive)",
+            "function getRegionRequestStatus(uint32 regionId) view returns (bool hasSubmittedRequest, bool isProcessed, uint256 timestamp)",
+            "function isAllocationPeriodActive() view returns (bool)",
+
+            "event RegionRegistered(uint32 indexed regionId, string name, address manager)",
+            "event AllocationPeriodStarted(uint32 indexed periodId, uint256 startTime)",
+            "event WaterRequested(uint32 indexed regionId, uint32 indexed periodId, address requester)",
+            "event WaterAllocated(uint32 indexed regionId, uint32 indexed periodId, uint32 amount)",
+            "event AllocationCompleted(uint32 indexed periodId, uint32 totalRegions)",
+            "event EmergencyAllocation(uint32 indexed regionId, uint32 amount)"
+        ];
+
+        class WaterResourceApp {
+            constructor() {
+                this.provider = null;
+                this.signer = null;
+                this.contract = null;
+                this.userAddress = null;
+                this.contractAddress = null;
+                this.isAdmin = false;
+                this.isRegionManager = false;
+                this.init();
+            }
+
+            async init() {
+                this.bindEvents();
+
+                // Load saved contract address or set default
+                const savedAddress = localStorage.getItem('contractAddress');
+                const defaultAddress = '0x4E2c3faE5165E4d5f9E2dEcFEA50e84399157b76';
+
+                if (savedAddress) {
+                    document.getElementById('contractAddressInput').value = savedAddress;
+                    this.setContractAddress(savedAddress);
+                } else {
+                    document.getElementById('contractAddressInput').value = defaultAddress;
+                    this.setContractAddress(defaultAddress);
+                }
+            }
+
+            bindEvents() {
+                document.getElementById('connectBtn').addEventListener('click', () => this.connectWallet());
+                document.getElementById('setContractBtn').addEventListener('click', () => this.setContractAddress());
+                document.getElementById('registerRegionBtn').addEventListener('click', () => this.registerRegion());
+                document.getElementById('startAllocationBtn').addEventListener('click', () => this.startAllocationPeriod());
+                document.getElementById('submitRequestBtn').addEventListener('click', () => this.submitWaterRequest());
+                document.getElementById('refreshBtn').addEventListener('click', () => this.loadPeriodInfo());
+                document.getElementById('processAllocationBtn').addEventListener('click', () => this.processAllocation());
+                document.getElementById('emergencyAllocationBtn').addEventListener('click', () => this.emergencyAllocation());
+                document.getElementById('deactivateRegionBtn').addEventListener('click', () => this.deactivateRegion());
+                document.getElementById('viewRegionBtn').addEventListener('click', () => this.viewRegionInfo());
+                document.getElementById('viewStatusBtn').addEventListener('click', () => this.viewRequestStatus());
+            }
+
+            setContractAddress(address = null) {
+                const inputAddress = address || document.getElementById('contractAddressInput').value.trim();
+
+                if (!inputAddress) {
+                    this.addLog('Please enter a contract address', 'warning');
+                    return;
+                }
+
+                if (!ethers.utils.isAddress(inputAddress)) {
+                    this.addLog('Invalid contract address format', 'error');
+                    return;
+                }
+
+                this.contractAddress = inputAddress;
+                document.getElementById('contractAddress').textContent = inputAddress;
+                localStorage.setItem('contractAddress', inputAddress);
+
+                // Re-initialize contract if wallet is connected
+                if (this.signer) {
+                    this.contract = new ethers.Contract(this.contractAddress, contractABI, this.signer);
+                    this.checkUserRole();
+                    this.loadPeriodInfo();
+                }
+
+                this.addLog('Contract address set successfully', 'success');
+            }
+
+            async connectWallet() {
+                try {
+                    if (typeof window.ethereum !== 'undefined') {
+                        this.provider = new ethers.providers.Web3Provider(window.ethereum);
+                        await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        this.signer = this.provider.getSigner();
+                        this.userAddress = await this.signer.getAddress();
+
+                        // Get network info
+                        const network = await this.provider.getNetwork();
+                        document.getElementById('networkName').textContent = network.name || 'Unknown';
+                        document.getElementById('chainId').textContent = network.chainId;
+
+                        // Initialize contract if address is set
+                        if (this.contractAddress) {
+                            this.contract = new ethers.Contract(this.contractAddress, contractABI, this.signer);
+                        }
+
+                        this.updateConnectionStatus(true);
+                        await this.checkUserRole();
+                        await this.loadPeriodInfo();
+                        this.addLog('Wallet connected successfully', 'success');
+
+                        // Listen for account changes
+                        window.ethereum.on('accountsChanged', (accounts) => {
+                            if (accounts.length === 0) {
+                                this.disconnect();
+                            } else {
+                                window.location.reload();
+                            }
+                        });
+
+                        // Listen for chain changes
+                        window.ethereum.on('chainChanged', () => {
+                            window.location.reload();
+                        });
+
+                    } else {
+                        throw new Error('Please install MetaMask wallet');
+                    }
+                } catch (error) {
+                    console.error('Failed to connect wallet:', error);
+                    this.addLog('Failed to connect wallet: ' + error.message, 'error');
+                }
+            }
+
+            disconnect() {
+                this.provider = null;
+                this.signer = null;
+                this.contract = null;
+                this.userAddress = null;
+                this.isAdmin = false;
+                this.isRegionManager = false;
+
+                this.updateConnectionStatus(false);
+                document.getElementById('adminSection').style.display = 'none';
+                document.getElementById('managerSection').style.display = 'none';
+                document.getElementById('networkName').textContent = 'Not Connected';
+                document.getElementById('chainId').textContent = '-';
+            }
+
+            updateConnectionStatus(connected) {
+                const statusElement = document.getElementById('connectionStatus');
+                const connectBtn = document.getElementById('connectBtn');
+                const workflowStatus = document.getElementById('workflowStatus');
+
+                if (connected) {
+                    statusElement.innerHTML = `<span class="badge bg-success status-badge">Connected: ${this.userAddress.slice(0,10)}...</span>`;
+                    connectBtn.textContent = 'Connected';
+                    connectBtn.disabled = true;
+                    this.updateWorkflowStatus();
+                } else {
+                    statusElement.innerHTML = '<span class="badge bg-warning status-badge">Not Connected</span>';
+                    connectBtn.textContent = 'Connect Wallet';
+                    connectBtn.disabled = false;
+                    workflowStatus.textContent = 'Please connect your wallet first';
+                }
+            }
+
+            async updateWorkflowStatus() {
+                const workflowStatus = document.getElementById('workflowStatus');
+
+                if (!this.contract) {
+                    workflowStatus.innerHTML = '⚠️ Contract not connected. Please set contract address.';
+                    return;
+                }
+
+                try {
+                    const isActive = await this.contract.isAllocationPeriodActive();
+                    const currentPeriod = await this.contract.currentAllocationPeriod();
+
+                    if (this.isAdmin && currentPeriod == 0) {
+                        workflowStatus.innerHTML = '🏛️ <strong>Admin Action Required:</strong> Register regions and start first allocation period';
+                    } else if (this.isAdmin && !isActive) {
+                        workflowStatus.innerHTML = '🏛️ <strong>Admin Action Required:</strong> Start new allocation period';
+                    } else if (isActive) {
+                        workflowStatus.innerHTML = '✅ <strong>Active Allocation Period:</strong> Region managers can submit water requests';
+                    } else {
+                        workflowStatus.innerHTML = '⏳ <strong>Waiting:</strong> No active allocation period';
+                    }
+                } catch (error) {
+                    workflowStatus.innerHTML = '❌ <strong>Error:</strong> Unable to check contract status';
+                }
+            }
+
+            async checkUserRole() {
+                if (!this.contract) return;
+
+                try {
+                    const authority = await this.contract.authority();
+                    this.isAdmin = authority.toLowerCase() === this.userAddress.toLowerCase();
+
+                    // Check if user is a region manager (simplified check)
+                    this.isRegionManager = true; // Allow all users to act as region managers for testing
+
+                    this.showSections();
+                    this.updateWorkflowStatus();
+                } catch (error) {
+                    console.error('Failed to check user role:', error);
+                    this.addLog('Failed to check user role: ' + error.message, 'warning');
+                }
+            }
+
+            showSections() {
+                if (this.isAdmin) {
+                    document.getElementById('adminSection').style.display = 'block';
+                }
+                if (this.isRegionManager) {
+                    document.getElementById('managerSection').style.display = 'block';
+                }
+            }
+
+            async registerRegion() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    const name = document.getElementById('regionName').value.trim();
+                    const priority = parseInt(document.getElementById('priorityLevel').value);
+                    const managerAddr = document.getElementById('managerAddress').value.trim();
+
+                    if (!name || !priority || !managerAddr) {
+                        throw new Error('Please fill all fields');
+                    }
+
+                    if (!ethers.utils.isAddress(managerAddr)) {
+                        throw new Error('Invalid manager address');
+                    }
+
+                    this.addLog('Registering region...', 'info');
+                    const tx = await this.contract.registerRegion(name, priority, managerAddr);
+
+                    this.addLog('Transaction sent, waiting for confirmation...', 'info');
+                    const receipt = await tx.wait();
+
+                    this.addLog(`Region "${name}" registered successfully`, 'success');
+                    this.addLog(`Transaction hash: ${receipt.transactionHash}`, 'info');
+
+                    // Clear form
+                    document.getElementById('regionName').value = '';
+                    document.getElementById('priorityLevel').value = '';
+                    document.getElementById('managerAddress').value = '';
+
+                } catch (error) {
+                    console.error('Failed to register region:', error);
+                    this.addLog('Failed to register region: ' + error.message, 'error');
+                }
+            }
+
+            async startAllocationPeriod() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    const totalWater = parseInt(document.getElementById('totalWaterAmount').value);
+                    const duration = parseInt(document.getElementById('durationHours').value);
+
+                    if (!totalWater || !duration) {
+                        throw new Error('Please fill all fields');
+                    }
+
+                    this.addLog('Starting allocation period...', 'info');
+                    const tx = await this.contract.startAllocationPeriod(totalWater, duration);
+
+                    this.addLog('Transaction sent, waiting for confirmation...', 'info');
+                    const receipt = await tx.wait();
+
+                    this.addLog('Allocation period started successfully', 'success');
+                    this.addLog(`Transaction hash: ${receipt.transactionHash}`, 'info');
+
+                    // Clear form and refresh info
+                    document.getElementById('totalWaterAmount').value = '';
+                    document.getElementById('durationHours').value = '';
+                    await this.loadPeriodInfo();
+
+                } catch (error) {
+                    console.error('Failed to start allocation period:', error);
+                    this.addLog('Failed to start allocation period: ' + error.message, 'error');
+                }
+            }
+
+            async submitWaterRequest() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    // Check if allocation period is active first
+                    const isActive = await this.contract.isAllocationPeriodActive();
+                    if (!isActive) {
+                        this.addLog('❌ Cannot submit request: No active allocation period. Please wait for admin to start an allocation period.', 'error');
+                        this.updateWorkflowStatus();
+                        return;
+                    }
+
+                    const amount = parseInt(document.getElementById('requestAmount').value);
+                    const score = parseInt(document.getElementById('justificationScore').value);
+
+                    if (!amount || !score) {
+                        throw new Error('Please fill all fields');
+                    }
+
+                    if (score < 1 || score > 100) {
+                        throw new Error('Urgency score must be between 1 and 100');
+                    }
+
+                    this.addLog('Submitting water request...', 'info');
+                    const tx = await this.contract.submitWaterRequest(amount, score);
+
+                    this.addLog('Transaction sent, waiting for confirmation...', 'info');
+                    const receipt = await tx.wait();
+
+                    this.addLog('Water request submitted successfully', 'success');
+                    this.addLog(`Transaction hash: ${receipt.transactionHash}`, 'info');
+
+                    // Clear form and update status
+                    document.getElementById('requestAmount').value = '';
+                    document.getElementById('justificationScore').value = '';
+                    this.updateWorkflowStatus();
+
+                } catch (error) {
+                    console.error('Failed to submit water request:', error);
+
+                    let errorMessage = error.message;
+                    if (errorMessage.includes('Not during allocation period')) {
+                        errorMessage = '❌ Cannot submit request: No active allocation period. Admin must start allocation period first.';
+                    } else if (errorMessage.includes('Not a registered region manager')) {
+                        errorMessage = '❌ You are not registered as a region manager. Please contact the admin.';
+                    } else if (errorMessage.includes('Region already submitted request')) {
+                        errorMessage = '❌ Your region has already submitted a request for this allocation period.';
+                    }
+
+                    this.addLog('Failed to submit water request: ' + errorMessage, 'error');
+                    this.updateWorkflowStatus();
+                }
+            }
+
+            async processAllocation() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    this.addLog('Processing water allocation...', 'info');
+                    const tx = await this.contract.processAllocation();
+
+                    this.addLog('Transaction sent, waiting for confirmation...', 'info');
+                    const receipt = await tx.wait();
+
+                    this.addLog('Water allocation processed successfully', 'success');
+                    this.addLog(`Transaction hash: ${receipt.transactionHash}`, 'info');
+
+                    await this.loadPeriodInfo();
+
+                } catch (error) {
+                    console.error('Failed to process allocation:', error);
+                    this.addLog('Failed to process allocation: ' + error.message, 'error');
+                }
+            }
+
+            async emergencyAllocation() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    const regionId = parseInt(document.getElementById('emergencyRegionId').value);
+                    const amount = parseInt(document.getElementById('emergencyAmount').value);
+
+                    if (!regionId || !amount) {
+                        throw new Error('Please fill all fields');
+                    }
+
+                    this.addLog('Processing emergency allocation...', 'info');
+                    const tx = await this.contract.emergencyWaterAllocation(regionId, amount);
+
+                    this.addLog('Transaction sent, waiting for confirmation...', 'info');
+                    const receipt = await tx.wait();
+
+                    this.addLog(`Emergency allocation for region ${regionId} completed`, 'success');
+                    this.addLog(`Transaction hash: ${receipt.transactionHash}`, 'info');
+
+                    // Clear form
+                    document.getElementById('emergencyRegionId').value = '';
+                    document.getElementById('emergencyAmount').value = '';
+
+                } catch (error) {
+                    console.error('Failed to process emergency allocation:', error);
+                    this.addLog('Failed to process emergency allocation: ' + error.message, 'error');
+                }
+            }
+
+            async deactivateRegion() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    const regionId = parseInt(document.getElementById('deactivateRegionId').value);
+
+                    if (!regionId) {
+                        throw new Error('Please enter region ID');
+                    }
+
+                    this.addLog('Deactivating region...', 'info');
+                    const tx = await this.contract.deactivateRegion(regionId);
+
+                    this.addLog('Transaction sent, waiting for confirmation...', 'info');
+                    const receipt = await tx.wait();
+
+                    this.addLog(`Region ${regionId} deactivated successfully`, 'success');
+                    this.addLog(`Transaction hash: ${receipt.transactionHash}`, 'info');
+
+                    // Clear form
+                    document.getElementById('deactivateRegionId').value = '';
+
+                } catch (error) {
+                    console.error('Failed to deactivate region:', error);
+                    this.addLog('Failed to deactivate region: ' + error.message, 'error');
+                }
+            }
+
+            async viewRegionInfo() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    const regionId = parseInt(document.getElementById('viewRegionId').value);
+
+                    if (!regionId) {
+                        throw new Error('Please enter region ID');
+                    }
+
+                    const info = await this.contract.getRegionInfo(regionId);
+
+                    const html = `
+                        <div class="alert alert-info">
+                            <strong>Region Name:</strong> ${info.name}<br>
+                            <strong>Active:</strong> ${info.isActive ? 'Yes' : 'No'}<br>
+                            <strong>Manager:</strong> ${info.manager}<br>
+                            <strong>Last Update:</strong> ${new Date(info.lastUpdateTime * 1000).toLocaleString()}
+                        </div>
+                    `;
+
+                    document.getElementById('regionInfo').innerHTML = html;
+
+                } catch (error) {
+                    console.error('Failed to get region info:', error);
+                    document.getElementById('regionInfo').innerHTML = `<div class="alert alert-danger">Failed to load region info: ${error.message}</div>`;
+                }
+            }
+
+            async viewRequestStatus() {
+                if (!this.contract) {
+                    this.addLog('Please connect wallet and set contract address first', 'error');
+                    return;
+                }
+
+                try {
+                    const regionId = parseInt(document.getElementById('statusRegionId').value);
+
+                    if (!regionId) {
+                        throw new Error('Please enter region ID');
+                    }
+
+                    const status = await this.contract.getRegionRequestStatus(regionId);
+
+                    const html = `
+                        <div class="alert alert-info">
+                            <strong>Has Submitted Request:</strong> ${status.hasSubmittedRequest ? 'Yes' : 'No'}<br>
+                            <strong>Is Processed:</strong> ${status.isProcessed ? 'Yes' : 'No'}<br>
+                            <strong>Timestamp:</strong> ${status.timestamp > 0 ? new Date(status.timestamp * 1000).toLocaleString() : 'Not available'}
+                        </div>
+                    `;
+
+                    document.getElementById('requestStatus').innerHTML = html;
+
+                } catch (error) {
+                    console.error('Failed to get request status:', error);
+                    document.getElementById('requestStatus').innerHTML = `<div class="alert alert-danger">Failed to load request status: ${error.message}</div>`;
+                }
+            }
+
+            async loadPeriodInfo() {
+                try {
+                    if (!this.contract) {
+                        document.getElementById('periodInfo').innerHTML = '<p class="text-muted">Please connect wallet and set contract address first</p>';
+                        return;
+                    }
+
+                    const info = await this.contract.getCurrentPeriodInfo();
+
+                    let html = `
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>Period ID:</strong> ${info.periodId.toString()}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Status:</strong>
+                                <span class="badge ${info.isActive ? 'bg-success' : 'bg-secondary'} status-badge">
+                                    ${info.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Participating Regions:</strong> ${info.participatingRegions.toString()}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Distribution Completed:</strong>
+                                <span class="badge ${info.distributionCompleted ? 'bg-success' : 'bg-warning'} status-badge">
+                                    ${info.distributionCompleted ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+
+                    if (info.periodId > 0) {
+                        html += `
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <strong>Start Time:</strong> ${new Date(info.startTime * 1000).toLocaleString()}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>End Time:</strong> ${new Date(info.endTime * 1000).toLocaleString()}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    document.getElementById('periodInfo').innerHTML = html;
+
+                    // Show process allocation button for admin if period is active
+                    const processBtn = document.getElementById('processAllocationBtn');
+                    if (info.isActive && !info.distributionCompleted && this.isAdmin) {
+                        processBtn.style.display = 'inline-block';
+                    } else {
+                        processBtn.style.display = 'none';
+                    }
+
+                    // Update workflow status
+                    this.updateWorkflowStatus();
+
+                } catch (error) {
+                    console.error('Failed to load period info:', error);
+                    document.getElementById('periodInfo').innerHTML = '<p class="text-danger">Failed to load</p>';
+                }
+            }
+
+            addLog(message, type = 'info') {
+                const logContainer = document.getElementById('logContainer');
+                const timestamp = new Date().toLocaleTimeString();
+
+                const alertClass = {
+                    'success': 'alert-success',
+                    'error': 'alert-danger',
+                    'warning': 'alert-warning',
+                    'info': 'alert-info'
+                }[type] || 'alert-info';
+
+                const logEntry = document.createElement('div');
+                logEntry.className = `alert ${alertClass} alert-dismissible fade show`;
+                logEntry.innerHTML = `
+                    <strong>[${timestamp}]</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+
+                if (logContainer.children.length === 0 || logContainer.children[0].textContent.includes('No operations recorded')) {
+                    logContainer.innerHTML = '';
+                }
+
+                logContainer.insertBefore(logEntry, logContainer.firstChild);
+
+                // Keep only last 10 logs
+                while (logContainer.children.length > 10) {
+                    logContainer.removeChild(logContainer.lastChild);
+                }
+            }
+        }
+
+        // Check if ethers is loaded and initialize the app
+        function initApp() {
+            if (typeof ethers !== 'undefined') {
+                new WaterResourceApp();
+            } else {
+                console.error('Ethers.js failed to load');
+                document.getElementById('connectionStatus').innerHTML =
+                    '<span class="badge bg-danger status-badge">Ethers.js failed to load</span>';
+
+                // Try alternative CDN
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js';
+                script.onload = () => {
+                    if (typeof ethers !== 'undefined') {
+                        new WaterResourceApp();
+                    } else {
+                        document.getElementById('connectionStatus').innerHTML =
+                            '<span class="badge bg-danger status-badge">Failed to load Web3 library</span>';
+                    }
+                };
+                script.onerror = () => {
+                    document.getElementById('connectionStatus').innerHTML =
+                        '<span class="badge bg-danger status-badge">Network error - check internet connection</span>';
+                };
+                document.head.appendChild(script);
+            }
+        }
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
