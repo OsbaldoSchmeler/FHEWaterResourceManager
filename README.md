@@ -4,6 +4,10 @@ A privacy-preserving water allocation system powered by Fully Homomorphic Encryp
 
 **Built with [Zama FHEVM](https://docs.zama.ai/fhevm)** - Demonstrating practical privacy-preserving applications for critical infrastructure management.
 
+Live Demo: https://fhe-water-resource-manager.vercel.app/
+
+Video: demo.mp4
+
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Solidity](https://img.shields.io/badge/solidity-0.8.24-brightgreen.svg)](https://soliditylang.org/)
 [![FHE](https://img.shields.io/badge/FHE-Zama-purple.svg)](https://www.zama.ai/)
